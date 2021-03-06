@@ -7,14 +7,8 @@ using UnityEngine;
 [RequireComponent(typeof(MeshCollider))]
 public class TileGenerationScript : MonoBehaviour
 {
-    
-	protected int[] size = new int[] {10, 8};
-	protected float resolution = 0.5f;
-	protected float height = 1f;
-	float normalRes = 0.01f;
 
-	float sinFreq = 0.18f;
-	float cosFreq = 0.2f;
+	public LandscapeData landscapeData;
 
 	Vector3[] vertices;
 	int[] triangles;
@@ -24,30 +18,30 @@ public class TileGenerationScript : MonoBehaviour
 	// Start is called before the first frame update
     void Start()
     {
-		vertices = new Vector3[size[0]*size[1]];
+		vertices = new Vector3[landscapeData.TileSize[0] * landscapeData.TileSize[1]];
 		normals = new Vector3[vertices.Length];
-		for (int i = 0; i < size[0]; i++) {
-			for (int j = 0; j < size[1]; j++) {
-				vertices[j * size[0] + i] = new Vector3(i, 0, j) *resolution;
-				vertices[j * size[0] + i] += Vector3.up * VerticeHeight(vertices[j * size[0] + i].x, vertices[j * size[0] + i].z);
+		for (int i = 0; i < landscapeData.TileSize[0]; i++) {
+			for (int j = 0; j < landscapeData.TileSize[1]; j++) {
+				vertices[j * landscapeData.TileSize[0] + i] = new Vector3(i, 0, j) * landscapeData.Resolution;
+				vertices[j * landscapeData.TileSize[0] + i] += Vector3.up * VerticeHeight(vertices[j * landscapeData.TileSize[0] + i].x, vertices[j * landscapeData.TileSize[0] + i].z);
 
-				fracVertice[0] = new Vector3(i, 0, j) *resolution + Vector3.right*normalRes + Vector3.up * VerticeHeight(vertices[j * size[0] + i].x+normalRes, vertices[j * size[0] + i].z);
-				fracVertice[1] = new Vector3(i, 0, j) *resolution + Vector3.forward*normalRes + Vector3.up * VerticeHeight(vertices[j * size[0] + i].x, vertices[j * size[0] + i].z+normalRes);
-				normals[j * size[0] + i] = Vector3.Cross(fracVertice[1] - vertices[j * size[0] + i], fracVertice[0] - vertices[j * size[0] + i]);
+				fracVertice[0] = new Vector3(i, 0, j) * landscapeData.Resolution + Vector3.right* landscapeData.NormalRes + Vector3.up * VerticeHeight(vertices[j * landscapeData.TileSize[0] + i].x + landscapeData.NormalRes, vertices[j * landscapeData.TileSize[0] + i].z);
+				fracVertice[1] = new Vector3(i, 0, j) * landscapeData.Resolution + Vector3.forward* landscapeData.NormalRes + Vector3.up * VerticeHeight(vertices[j * landscapeData.TileSize[0] + i].x, vertices[j * landscapeData.TileSize[0] + i].z+ landscapeData.NormalRes);
+				normals[j * landscapeData.TileSize[0] + i] = Vector3.Cross(fracVertice[1] - vertices[j * landscapeData.TileSize[0] + i], fracVertice[0] - vertices[j * landscapeData.TileSize[0] + i]);
 			}
 		}
 
-		int triangleAmount = (size[0]-1)*(size[1]-1)*2;
+		int triangleAmount = (landscapeData.TileSize[0]-1)*(landscapeData.TileSize[1]-1)*2;
 		triangles = new int[triangleAmount*3];
-		for (int i = 0; i < size[0]-1; i++) {
-			for (int j = 0; j < size[1]-1; j++) {
-				int c = j*(size[0]) + i;
-				int p = (j * (size[0]-1) + i) * 6;
+		for (int i = 0; i < landscapeData.TileSize[0]-1; i++) {
+			for (int j = 0; j < landscapeData.TileSize[1]-1; j++) {
+				int c = j*(landscapeData.TileSize[0]) + i;
+				int p = (j * (landscapeData.TileSize[0]-1) + i) * 6;
 				triangles[p] = c;
-				triangles[p+1] = c+size[0];
+				triangles[p+1] = c+ landscapeData.TileSize[0];
 				triangles[p+2] = c+1;
-				triangles[p+3] = c+size[0];
-				triangles[p+4] = c+size[0]+1;
+				triangles[p+3] = c+ landscapeData.TileSize[0];
+				triangles[p+4] = c+ landscapeData.TileSize[0]+1;
 				triangles[p+5] = c+1;
 			}
 		}
@@ -61,11 +55,11 @@ public class TileGenerationScript : MonoBehaviour
     }
 
 	float VerticeHeight(float right, float forward) {
-		return (Mathf.Sin((transform.position.x + right) * sinFreq) + Mathf.Cos((transform.position.z + forward) * cosFreq)) * height/2;
+		return (Mathf.Sin((transform.position.x + right) * landscapeData.SinFreq) + Mathf.Cos((transform.position.z + forward) * landscapeData.CosFreq)) * landscapeData.Height/2;
 	}
 
 	public float GetHeight() {
-		return height;
+		return landscapeData.Height;
 	}
 
 }
