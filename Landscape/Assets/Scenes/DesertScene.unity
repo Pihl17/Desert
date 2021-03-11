@@ -704,7 +704,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &999162744
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -731,7 +731,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 092acf577b1a3174490dff0ae1ce96cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  landscapeData: {fileID: 0}
+  landscapeData: {fileID: 11400000, guid: abbcf5bddd877b44a859d8d0a244ce4f, type: 2}
 --- !u!64 &999162746
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1030,7 +1030,7 @@ PrefabInstance:
     - target: {fileID: 1677290655009851733, guid: 47a03ca210265804ab4219eb77e86f29,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1169512163786448679, guid: 47a03ca210265804ab4219eb77e86f29,
         type: 3}

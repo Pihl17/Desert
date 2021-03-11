@@ -8,12 +8,12 @@ public class ProceduralTileScript : TileGenerationScript
 	GameObject player;
 	float playerDis;
 
-	Vector3 offset;
+	Vector3 TileMiddle;
 	Vector3 disRight;
 	Vector3 disForward;
 
 	void Awake() {
-		offset = new Vector3(landscapeData.TileSize[0]-1, 0, landscapeData.TileSize[1]-1) / 2 * landscapeData.Resolution + Vector3.up*(landscapeData.Height + 0.2f);
+		TileMiddle = new Vector3(landscapeData.TileSize[0]-1, 0, landscapeData.TileSize[1]-1) / 2 * landscapeData.Resolution + Vector3.up*(landscapeData.Height + 0.2f);
 		disRight = Vector3.right*(landscapeData.TileSize[0]-1)* landscapeData.Resolution;
 		disForward = Vector3.forward*(landscapeData.TileSize[1]-1)* landscapeData.Resolution;
 		player = GameObject.Find("Player");
@@ -22,7 +22,7 @@ public class ProceduralTileScript : TileGenerationScript
     // Update is called once per frame
     void Update() {
 		if (player != null) {
-			playerDis = Mathf.Abs((player.transform.position - (transform.position + offset)).magnitude);
+			playerDis = Mathf.Abs((player.transform.position - (transform.position + TileMiddle)).magnitude);
 			if (playerDis < landscapeData.MinDis) {
 				GenerateTile(disRight);
 				GenerateTile(disForward);
@@ -37,7 +37,7 @@ public class ProceduralTileScript : TileGenerationScript
     }
 
 	void GenerateTile(Vector3 direction) {
-		if (!Physics.Raycast(transform.position + offset + direction, Vector3.down, landscapeData.Height * 2+0.4f)) {
+		if (!Physics.Raycast(transform.position + TileMiddle + direction, Vector3.down, landscapeData.Height * 2+0.4f)) {
 			GameObject newTile = GameObject.Instantiate(gameObject, transform.position + direction, transform.rotation);
 			newTile.name = gameObject.name;
 		}

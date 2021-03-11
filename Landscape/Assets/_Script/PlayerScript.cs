@@ -6,14 +6,12 @@ public class PlayerScript : MonoBehaviour
 {
 
 	float speed = 10;
-	//Camera cam;
-	//float camDis = 5;
 	float rotSpeed = 90;
 
     // Start is called before the first frame update
     void Start()
     {
-		//cam = Camera.main;
+		
     }
 
     // Update is called once per frame
