@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileSize: 0a00000008000000
   resolution: 0.5
-  height: 1
+  height: 2
   normalRes: 0.01
   sinFreq: 0.18
-  cosFreq: 0.2
+  cosFreq: 0.1
   minDis: 50
   maxDis: 55
