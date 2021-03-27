@@ -65,20 +65,12 @@ public class Cylinder : RuledSurface {
 		return surface;
 	}
 
-	Vector3 DirectrixC(float u) {
+	protected override Vector3 DirectrixC(float u) {
 		return new Vector3(Mathf.Cos(u * 2 * Mathf.PI), 0, Mathf.Sin(u * 2 * Mathf.PI)) * radius;
 	}
 
-	Vector3 DirectrixD(float u) {
+	protected override Vector3 DirectrixD(float u) {
 		return DirectrixC(u + topRotationOffset) * deltaRadius + Vector3.up * height;
-	}
-
-	Vector3 GeneratorLine(float u) {
-		return DirectrixD(u) - DirectrixC(u);
-	}
-
-	Vector3 GeneratorLine(float u, float v) {
-		return GeneratorLine(u) * v;
 	}
 
 	private void OnDrawGizmosSelected() {

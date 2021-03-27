@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
-public class RuledSurface : MonoBehaviour
+public abstract class RuledSurface : MonoBehaviour
 {
 
 	protected void SetMesh(Surface surface) {
@@ -20,6 +20,24 @@ public class RuledSurface : MonoBehaviour
 	}
 
 
+	protected abstract Vector3 DirectrixC(float u);
+
+	protected virtual Vector3 DirectrixD(float u) {
+		return DirectrixC(u) + GeneratorLine(u);
+	}
+
+	protected virtual Vector3 GeneratorLine(float u) {
+		try {
+			return DirectrixD(u) - DirectrixC(u);
+		} catch (System.StackOverflowException) {
+			Debug.LogError("Stack overflow in definition of the Generator Line of a surface", this);
+			throw new System.StackOverflowException();
+		}
+	}
+
+	protected Vector3 GeneratorLine(float u, float v) {
+		return GeneratorLine(u) * v;
+	}
 
 
 	public struct Surface {
