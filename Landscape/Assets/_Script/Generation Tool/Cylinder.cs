@@ -5,11 +5,11 @@ using UnityEngine;
 
 public class Cylinder : RuledSurface {
 
-	public int resolution = 4;
-	public int heightResolution = 2;
-	public float height = 1;
-	public float radius = 1;
-	public float deltaRadius = 1;
+	[Min(3)] public int resolution = 4;
+	[Min(2)] public int heightResolution = 2;
+	[Min(0)] public float height = 1;
+	[Min(0)] public float radius = 1;
+	[Min(0)] public float deltaRadius = 1;
 	[Range(0,1)] public float topRotationOffset = 0;
 	
 	// Start is called before the first frame update
@@ -21,34 +21,20 @@ public class Cylinder : RuledSurface {
     }
 
 	Surface DefineSurface() {
-		Surface surface = new Surface();
-		surface.vertices = new Vector3[resolution * heightResolution + 2];
-		surface.triangles = new int[resolution * heightResolution * 6 + resolution * 6];
-		surface = LateralSurface(surface);
-		surface = AddCircleSurfaces(surface);
+		Surface surface = LateralSurface();
+		surface.Add(CircleSurface(true));
+		surface.Add(CircleSurface().InverseNormals());
 		return surface;
 	}
 
-	Surface LateralSurface(Surface surface) {
-		//Surface surface = new Surface();
-		/*for (int i = 0; i < resolution; i++) {
-			surface.vertices[i*2] = DirectrixC((float)i/resolution);
-			surface.vertices[i*2 + 1] = DirectrixD((float)i/resolution);
-			
+	Surface LateralSurface() {
+		Surface surface = new Surface();
+		surface.vertices = new Vector3[resolution * heightResolution];
+		surface.triangles = new int[resolution * heightResolution * 6];
 
-			if (i != resolution-1) {
-				surface.triangles[i * 6] = i * 2;
-				surface.triangles[i * 6 + 1] = i * 2 + 1;
-				surface.triangles[i * 6 + 2] = i * 2 + 2;
-				surface.triangles[i * 6 + 3] = i * 2 + 1;
-				surface.triangles[i * 6 + 4] = i * 2 + 3;
-				surface.triangles[i * 6 + 5] = i * 2 + 2;
-			}
-		}*/
 		for (int i = 0; i < resolution; i++) {
 			for (int j = 0; j < heightResolution; j++) {
 				surface.vertices[i * heightResolution + j] = DirectrixC((float)i / resolution) + GeneratorLine((float)i / resolution, (float)j / (heightResolution - 1));
-
 
 				if (j != heightResolution - 1)
 					if (i != resolution - 1)
@@ -57,21 +43,25 @@ public class Cylinder : RuledSurface {
 						surface.DetermineFace(i * 6 * heightResolution + j * 6, i * heightResolution + j, i * heightResolution + j + 1, j +1, j);
 			}
 		}
+
 		return surface;
 	}
 
-	Surface AddCircleSurfaces(Surface surface) {
-		surface.vertices[resolution * heightResolution] = Vector3.zero;
-		surface.vertices[resolution * heightResolution + 1] = Vector3.up * height;
+	Surface CircleSurface(bool topPart = false) {
+		Surface surface = new Surface();
+		surface.vertices = new Vector3[resolution + 1];
+		surface.triangles = new int[resolution * 3];
+
+		surface.vertices[0] = topPart ? Vector3.up * height : Vector3.zero;
 		for (int i = 0; i < resolution; i++) {
-			if (i == 0) {
-				surface.DetermineTriangles(resolution * heightResolution * 6 + i * 3, heightResolution * i, resolution * heightResolution, heightResolution * (resolution - 1));
-				surface.DetermineTriangles(resolution * heightResolution * 6 + resolution * 3 + i * 3, heightResolution * (resolution - 1) + heightResolution - 1, resolution * heightResolution + 1, heightResolution * i + heightResolution - 1);
-			} else {
-				surface.DetermineTriangles(resolution * heightResolution * 6 + i * 3, heightResolution * i, resolution * heightResolution, heightResolution * (i - 1));
-				surface.DetermineTriangles(resolution * heightResolution * 6 + resolution * 3 + i * 3, heightResolution * (i - 1) + heightResolution - 1, resolution * heightResolution + 1, heightResolution * i + heightResolution - 1);
-			}
+			surface.vertices[i + 1] = topPart ? DirectrixD((float)i / resolution) : DirectrixC((float)i / resolution);
+
+			if (i == 0)
+				surface.DetermineTriangles(i, resolution, 0, i + 1);
+			else
+				surface.DetermineTriangles(i*3, i, 0, i + 1);
 		}
+
 		return surface;
 	}
 
