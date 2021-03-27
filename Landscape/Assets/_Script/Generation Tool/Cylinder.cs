@@ -5,25 +5,32 @@ using UnityEngine;
 
 public class Cylinder : RuledSurface {
 
-	public uint resolution = 4;
-	public uint heightResolution = 2;
+	public int resolution = 4;
+	public int heightResolution = 2;
 	public float height = 1;
 	public float radius = 1;
 	public float deltaRadius = 1;
-	public float topRotationOffset = 0;
+	[Range(0,1)] public float topRotationOffset = 0;
 	
 	// Start is called before the first frame update
     void Start()
     {
-		Surface surface = LateralShape();
+		Surface surface = DefineSurface();
 		SetMesh(surface);
 		
     }
 
-	Surface LateralShape() {
+	Surface DefineSurface() {
 		Surface surface = new Surface();
-		surface.vertices = new Vector3[resolution * heightResolution];
-		surface.triangles = new int[resolution * heightResolution * 6];
+		surface.vertices = new Vector3[resolution * heightResolution + 2];
+		surface.triangles = new int[resolution * heightResolution * 6 + resolution * 6];
+		surface = LateralSurface(surface);
+		surface = AddCircleSurfaces(surface);
+		return surface;
+	}
+
+	Surface LateralSurface(Surface surface) {
+		//Surface surface = new Surface();
 		/*for (int i = 0; i < resolution; i++) {
 			surface.vertices[i*2] = DirectrixC((float)i/resolution);
 			surface.vertices[i*2 + 1] = DirectrixD((float)i/resolution);
@@ -45,9 +52,24 @@ public class Cylinder : RuledSurface {
 
 				if (j != heightResolution - 1)
 					if (i != resolution - 1)
-						surface.DetermineTriangles(i * 6 * (int)heightResolution + j * 6, i * (int)heightResolution + j, (int)heightResolution);
+						surface.DetermineFace(i * 6 * heightResolution + j * 6, i * heightResolution + j, heightResolution);
 					else
-						surface.DetermineTriangles(i * 6 * (int)heightResolution + j * 6, i * (int)heightResolution + j, i * (int)heightResolution + j + 1, j +1, j);
+						surface.DetermineFace(i * 6 * heightResolution + j * 6, i * heightResolution + j, i * heightResolution + j + 1, j +1, j);
+			}
+		}
+		return surface;
+	}
+
+	Surface AddCircleSurfaces(Surface surface) {
+		surface.vertices[resolution * heightResolution] = Vector3.zero;
+		surface.vertices[resolution * heightResolution + 1] = Vector3.up * height;
+		for (int i = 0; i < resolution; i++) {
+			if (i == 0) {
+				surface.DetermineTriangles(resolution * heightResolution * 6 + i * 3, heightResolution * i, resolution * heightResolution, heightResolution * (resolution - 1));
+				surface.DetermineTriangles(resolution * heightResolution * 6 + resolution * 3 + i * 3, heightResolution * (resolution - 1) + heightResolution - 1, resolution * heightResolution + 1, heightResolution * i + heightResolution - 1);
+			} else {
+				surface.DetermineTriangles(resolution * heightResolution * 6 + i * 3, heightResolution * i, resolution * heightResolution, heightResolution * (i - 1));
+				surface.DetermineTriangles(resolution * heightResolution * 6 + resolution * 3 + i * 3, heightResolution * (i - 1) + heightResolution - 1, resolution * heightResolution + 1, heightResolution * i + heightResolution - 1);
 			}
 		}
 		return surface;
@@ -70,9 +92,11 @@ public class Cylinder : RuledSurface {
 	}
 
 	private void OnDrawGizmosSelected() {
-		Gizmos.matrix = Matrix4x4.Translate(transform.position);
+		if (resolution <= 0 || heightResolution <= 1)
+			return;
+		Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, transform.lossyScale);
 		Gizmos.color = Color.green;
-		Surface surface = LateralShape();
+		Surface surface = DefineSurface();
 		for (int i = 0; i < surface.triangles.Length; i += 3) {
 			Gizmos.DrawLine(surface.vertices[surface.triangles[i]], surface.vertices[surface.triangles[i+1]]);
 			Gizmos.DrawLine(surface.vertices[surface.triangles[i+1]], surface.vertices[surface.triangles[i+2]]);
